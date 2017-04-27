@@ -32,7 +32,7 @@ router.post('/task', function(req, res, next) {
   if (!task.title || (task.isDone + '')) {
     res.status(400);
     res.send({
-      "error": "Bad data"
+      'error': 'Bad data'
     });
   } else {
     db.task.save(task, function (err, task) {
@@ -42,6 +42,59 @@ router.post('/task', function(req, res, next) {
       res.send(task);
     });
   }
+});
+
+//Delete task
+router.delete('/task/:id', function(req, res, next) {
+  db.tasks.remove(
+    {_id: mongojs.ObjectId(req.params.id)},
+    function(err, task) {
+      if (err) {
+        res.send(err);
+      }
+      res.send(task);
+    });
+});
+
+// /Delete task
+router.put('/task/:id', function(req, res, next) {
+  var task = req.body;
+  var updTask = {};
+
+  if (task.isDone) {
+    updTask.isDone = task.isDone;
+  }
+
+  if (task.title) {
+    updTask.title = task.title;
+  }
+
+  if (!updTask) {
+    res.status(400);
+    res.send({
+      'error': 'Bad data'
+    });
+  } else {
+    db.tasks.update(
+      {_id: mongojs.ObjectId(req.params.id)},
+      updTask,
+      {},
+      function(err, task) {
+        if (err) {
+          res.send(err);
+        }
+        res.send(task);
+      });
+  }
+
+  db.tasks.remove(
+    {_id: mongojs.ObjectId(req.params.id)},
+    function(err, task) {
+      if (err) {
+        res.send(err);
+      }
+      res.send(task);
+    });
 });
 
 module.exports = router;
